@@ -1,7 +1,7 @@
 {
   "name": "my-app",
   "version": "0.1.0",
-  "homepage": "https://Pawel-Shykuta.github.io/Test_One",
+  "homepage": "https://Pawel-Shykuta.github.io/Test-one",
   "private": true,
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",

@@ -2,13 +2,13 @@ import React, { useState, useEffect, useRef } from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { useNavigate } from "react-router-dom";
 import "./Tabs.css";
-import { IoMdArrowDropdown } from "react-icons/io";
 import { BsFillTelephoneOutboundFill } from "react-icons/bs";
 import { CiBank, CiShop, CiMail, CiSettings } from "react-icons/ci";
 import { RxDashboard } from "react-icons/rx";
 import { IoPersonAddOutline, IoBookOutline, IoListOutline } from "react-icons/io5";
-import { FiBox, FiPieChart } from "react-icons/fi";
+import { FiBox, FiPieChart, FiXCircle } from "react-icons/fi";
 import { MdOutlineAddShoppingCart, MdOutlineArticle } from "react-icons/md";
+import { LiaThumbtackSolid } from "react-icons/lia";
 
 const iconComponents = {
   BsFillTelephoneOutboundFill,
@@ -54,10 +54,29 @@ function Tabs() {
   const navigate = useNavigate();
   const containerRef = useRef(null);
 
-  const [activeTab,setActiveTab] = useState(null);
- 
+  const [activeTab, setActiveTab] = useState(null);
+
+  const [fixedTabs, setFixedTabs] = useState(() => {
+    const savedFixedTabs = localStorage.getItem("fixedTabs");
+    return savedFixedTabs ? JSON.parse(savedFixedTabs) : [];  
+  });
+
+  useEffect(() => {
+    localStorage.setItem("fixedTabs", JSON.stringify(fixedTabs));
+  }, [fixedTabs]);
+
   const handleTabClick = (tabId) => {
     setActiveTab(tabId);
+  };
+
+  const toggleFixedTab = (tabId) => {
+    setFixedTabs((prev) => {
+      if (prev.includes(tabId)) {
+        return prev.filter((id) => id !== tabId); 
+      } else {
+        return [...prev, tabId];
+      }
+    });
   };
 
   useEffect(() => {
@@ -71,24 +90,28 @@ function Tabs() {
 
       for (const tab of tabs) {
         const tabWidth = 140;
-        if (totalWidth + tabWidth < containerWidth - 50) {
+        if (totalWidth + tabWidth < containerWidth - 120) {
           visible.push(tab);
           totalWidth += tabWidth;
         } else {
           hidden.push(tab);
         }
       }
-      setVisibleTabs(visible);
+
+      const fixedTabArray = visible.filter((tab) => fixedTabs.includes(tab.id));
+      const nonFixedTabArray = visible.filter((tab) => !fixedTabs.includes(tab.id));
+      
+      setVisibleTabs([...fixedTabArray, ...nonFixedTabArray]);
       setHiddenTabs(hidden);
     };
 
     updateTabVisibility();
     window.addEventListener("resize", updateTabVisibility);
     return () => window.removeEventListener("resize", updateTabVisibility);
-  }, [tabs]);
+  }, [tabs, fixedTabs]);
 
   useEffect(() => {
-    localStorage.setItem("tabs", JSON.stringify(tabs));  
+    localStorage.setItem("tabs", JSON.stringify(tabs));
   }, [tabs]);
 
   const handleDragEnd = (result) => {
@@ -100,11 +123,9 @@ function Tabs() {
     let updatedHiddenTabs = [...hiddenTabs];
 
     if (source.droppableId === destination.droppableId) {
-    
       const [movedTab] = (source.droppableId === "visibleTabs" ? updatedVisibleTabs : updatedHiddenTabs).splice(source.index, 1);
       (destination.droppableId === "visibleTabs" ? updatedVisibleTabs : updatedHiddenTabs).splice(destination.index, 0, movedTab);
     } else {
-      
       const [movedTab] = (source.droppableId === "visibleTabs" ? updatedVisibleTabs : updatedHiddenTabs).splice(source.index, 1);
       (destination.droppableId === "visibleTabs" ? updatedVisibleTabs : updatedHiddenTabs).splice(destination.index, 0, movedTab);
     }
@@ -112,7 +133,6 @@ function Tabs() {
     setVisibleTabs(updatedVisibleTabs);
     setHiddenTabs(updatedHiddenTabs);
 
-   
     const updatedTabs = [...updatedVisibleTabs, ...updatedHiddenTabs];
     setTabs(updatedTabs);
   };
@@ -124,16 +144,21 @@ function Tabs() {
           {(provided) => (
             <div ref={provided.innerRef} {...provided.droppableProps} className="tabs">
               {visibleTabs.map((tab, index) => (
-                <Draggable key={tab.id} draggableId={tab.id} index={index}>
+                <Draggable key={tab.id} draggableId={tab.id} index={index} isDragDisabled={fixedTabs.includes(tab.id)}>
                   {(provided) => (
                     <div
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
-                      onClick={() => {navigate(tab.url); handleTabClick(tab.id)}}
+                      onClick={() => { navigate(tab.url); handleTabClick(tab.id); }}
                       className={`tab ${activeTab === tab.id ? 'active' : ''}`}
                     >
                       {React.createElement(iconComponents[tab.iconName])} {tab.title}
+                      
+
+                      <button onClick={(e) => { e.stopPropagation(); toggleFixedTab(tab.id); }} className="fix-btn">
+                        {fixedTabs.includes(tab.id) ? <FiXCircle /> : <LiaThumbtackSolid />}
+                      </button>
                     </div>
                   )}
                 </Draggable>
@@ -146,7 +171,6 @@ function Tabs() {
         {hiddenTabs.length > 0 && (
           <div className="dropdown">
             <button className="dropdown-btn" onClick={() => setDropdownOpen(!dropdownOpen)}>
-              <IoMdArrowDropdown />
             </button>
             {dropdownOpen && (
               <Droppable droppableId="hiddenTabs">
@@ -159,7 +183,12 @@ function Tabs() {
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
-                            onClick={() => navigate(tab.url)}
+                            onClick={() => {
+                              navigate(tab.url);
+                              setDropdownOpen(!dropdownOpen)
+                            }
+
+                            }
                             className="dropdown-item"
                           >
                             {React.createElement(iconComponents[tab.iconName])} {tab.title}

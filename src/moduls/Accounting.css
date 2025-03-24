@@ -1,0 +1,106 @@
+.accounting-container {
+    width: 50%;
+    margin-left: 25%;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .towars-list {
+    width: 100%;
+    margin-top: 20px;
+  }
+  
+  .towar-item {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+  
+  .add-towar-form {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .add-towar-form input {
+    width: 100%;
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+  }
+  
+  .add-towar-form button {
+    width: 100%;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .add-towar-form button:hover {
+    background-color: #45a049;
+  }
+  
+  @media (max-width: 450px){
+
+
+    .accounting-container{
+      width: 100%;
+      margin: 0;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+    }
+    
+    .towars-list {
+      width: 100%;
+      margin-top: 20px;
+    }
+    
+    .towars-list h3{
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .towar-item {
+      width: 90%;
+      margin-bottom: 10px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    
+    .add-towar-form {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .add-towar-form input {
+      width: 80%;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+    }
+    
+    .add-towar-form button {
+      width: 70%;
+      height: 40px;
+      font-size: 17px;
+      padding: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    
+    .add-towar-form button:hover {
+      background-color: #45a049;
+    }
+  }
